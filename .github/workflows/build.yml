@@ -17,6 +17,27 @@ env:
   ELECTRON_BUILD_CMD: npx --no-install prebuild -r electron -t 16.0.0 -t 17.0.0 -t 18.0.0 -t 19.0.0 -t 20.0.0 -t 21.0.0 -t 22.0.0 -t 23.0.0 -t 24.0.0 -t 25.0.0 -t 26.0.0 --include-regex 'better_sqlite3.node$'
 
 jobs:
+  test:
+    strategy:
+      matrix:
+        os:
+          - ubuntu-20.04
+          - macos-latest
+          - windows-2019
+        node:
+          - 16
+          - 18
+          - 20
+    name: Testing Node ${{ matrix.node }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node }}
+      - run: npm install --ignore-scripts
+      - run: npm run build-debug
+
   publish:
     if: ${{ github.event_name == 'release' }}
     name: Publishing to NPM
